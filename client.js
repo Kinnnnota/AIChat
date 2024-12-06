@@ -107,6 +107,14 @@ async function deleteChatGroup(chatId) {
 
 // 修改创建新聊天的函数
 function createNewChat() {
+    // 检查是否已存在临时聊天
+    const existingTempChat = chatGroups.find(chat => chat.isTemp && chat.messages.length === 0);
+    if (existingTempChat) {
+        // 如果已存在临时聊天，直接切换到该聊天
+        switchChat(existingTempChat.id);
+        return;
+    }
+    
     const chatId = Date.now().toString();
     const newChat = {
         id: chatId,
@@ -349,7 +357,7 @@ function displayChatMessages(chat) {
         });
     }
 }
-// 清空聊天容器
+// 清空聊天��器
 function clearChatContainer() {
     const chatContainer = document.getElementById('chatContainer');
     chatContainer.innerHTML = '';
@@ -554,7 +562,7 @@ function switchChat(chatId) {
     }
 }
 
-// 重新生成回答
+// 重新生��回答
 async function regenerateResponse(messageDiv) {
     // 获取当前聊天组
     const currentChat = chatGroups.find(c => c.id === currentChatId);

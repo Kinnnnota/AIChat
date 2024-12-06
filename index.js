@@ -45,14 +45,18 @@ async function sendMessage(model, message) {
         const data = await response.json();
         
         // 将完整信息保存到文件
-        const fullResponse = {
-            status: response.status,
-            headers: Object.fromEntries(response.headers.entries()),
-            data: data
-        };
+        try {
+            const fullResponse = {
+                status: response.status,
+                headers: Object.fromEntries(response.headers.entries()),
+                data: data
+            };
 
-        await fs.writeFile('response.json', JSON.stringify(fullResponse, null, 2), 'utf8');
-        console.log('响应已保存到 response.json');
+            await fs.writeFile('response.json', JSON.stringify(fullResponse, null, 2), 'utf8');
+            console.log('响应已保存到 response.json');
+        } catch (fileError) {
+            console.error('保存响应文件失败，但继续执行：', fileError);
+        }
         
         return data;
     } catch (error) {
@@ -67,8 +71,12 @@ async function main() {
         const models = await getAvailableModels();
         
         // 将模型列表保存到文件
-        await fs.writeFile('available_models.json', JSON.stringify(models, null, 2), 'utf8');
-        console.log('模型列表已保存到 available_models.json');
+        try {
+            await fs.writeFile('available_models.json', JSON.stringify(models, null, 2), 'utf8');
+            console.log('模型列表已保存到 available_models.json');
+        } catch (fileError) {
+            console.error('保存模型列表失败，但继续执行：', fileError);
+        }
 
         // 如果有可用模型，使用第一个模型发送测试消息
         if (models && models.length > 0) {
