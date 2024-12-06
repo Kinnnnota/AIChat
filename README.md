@@ -1,16 +1,11 @@
 # AIChat
 
 一个基于多模型的聊天界面，支持多种AI模型的对话。
+需要搭配反向代理：
+https://github.com/YIWANG-sketch/YOUChat_Proxy
+或者
+https://gitgud.io/ahsk/clewd
 
-## 功能特点
-
-- 支持多种AI模型（GPT-4, Claude等）
-- 实时流式输出
-- 聊天记录持久化存储
-- 支持重新生成回答
-- 支持停止生成
-- 聊天记录管理
-- 消息预处理功能
 
 ## 安装
 
@@ -31,19 +26,6 @@ npm start
 
 4. 打开浏览器访问：`http://localhost:3001`
 
-## 配置
-
-可以通过修改 `config.json` 来配置消息预处理：
-
-```json
-{
-    "messagePreprocessing": {
-        "enabled": true,
-        "prefix": "自定义的预处理消息",
-        "systemMessage": "系统消息设置"
-    }
-}
-```
 
 ## 使用说明
 
@@ -56,9 +38,5 @@ npm start
 ## 注意事项
 
 - 需要确保反向代理服务器运行在 `http://127.0.0.1:8080`
-- 聊天记录保存�� `chats` 目录下
-- 建议使用现代浏览器以获得最佳体验
-
-## 许可证
-
-MIT License 
+- 聊天记录保存在 `chats` 目录下
+- 建议使用chrome浏览器以获得最佳体验
