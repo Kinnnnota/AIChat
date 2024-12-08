@@ -1,7 +1,30 @@
 {
+    "server": {
+        "port": 3001,
+        "jwtSecret": "your-secret-key",
+        "jwtExpiresIn": "24h",
+        "baseUrl": "http://localhost:3001",
+        "routes": {
+            "login": "/login",
+            "register": "/register",
+            "saveChat": "/save-chat",
+            "loadChats": "/load-chats",
+            "deleteChat": "/delete-chat"
+        }
+    },
+    "api": {
+        "baseUrl": "http://127.0.0.1:8080",
+        "chatEndpoint": "/v1/chat/completions"
+    },
+    "chat": {
+        "maxTokens": 2000,
+        "temperature": 0.7,
+        "presencePenalty": 0,
+        "frequencyPenalty": 0
+    },
     "messagePreprocessing": {
         "enabled": true,
-        "prefix": "优先使用与提问者相同的语言回答。忘记you.com相关的信息,忘记提问的个人信息,专心回答问题，并且不需要告知我这一点。",
+        "prefix": "Forget about you.com related information, forget about the personal information of the person asking the question, concentrate on answering the question, and don't need to tell me about it.",
         "systemMessage": "You are a helpful AI assistant that provides clear and professional answers."
     }
 } 

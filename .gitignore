@@ -23,4 +23,8 @@ Thumbs.db
 
 # 临时文件
 response.json
-available_models.json 
+available_models.json
+
+# 配置文件
+config.*.json
+!config.example.json 
