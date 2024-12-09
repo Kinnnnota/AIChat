@@ -727,7 +727,7 @@ function getCurrentChatMessages() {
         content: config.messagePreprocessing.systemMessage
     };
     
-    // 确保每条消息有���确的格式，并且保持完整的对话历史
+    // 确保每条消息有正确的格式，并且保持完整的对话历史
     const messages = currentChat.messages.map(msg => ({
         role: msg.role,
         content: msg.content || ''
@@ -877,7 +877,7 @@ function updateChatList() {
         const historyItem = document.createElement('div');
         historyItem.className = 'history-item' + (chat.id === currentChatId ? ' active' : '');
         
-        // 创建标题���删除按钮的容器
+        // 创建标题删除按钮的容器
         const itemContent = document.createElement('div');
         itemContent.className = 'history-item-content';
         
@@ -948,7 +948,7 @@ async function loadModels() {
     }
 }
 
-// 显示聊天息
+// 显示聊天消息
 function displayChatMessages(chat) {
     clearChatContainer();
     if (chat && chat.messages) {
@@ -1296,7 +1296,44 @@ async function handleStreamResponse(response, contentDiv) {
                         if (parsed.choices?.[0]?.delta?.content) {
                             const content = parsed.choices[0].delta.content;
                             fullContent += content;
-                            contentDiv.textContent = fullContent;
+                            
+                            // 清空现有内容
+                            contentDiv.innerHTML = '';
+                            
+                            // 检测和处理代码块
+                            if (fullContent.includes('```')) {
+                                const parts = fullContent.split(/(```[a-z]*\n[\s\S]*?(?:```|$))/g);
+                                parts.forEach(part => {
+                                    if (part.startsWith('```')) {
+                                        // 尝试匹配完整或未完成的代码块
+                                        const match = part.match(/```([a-z]*)\n([\s\S]*?)(?:```|$)/);
+                                        if (match) {
+                                            const [, language, code] = match;
+                                            const preElement = document.createElement('pre');
+                                            const codeElement = document.createElement('code');
+                                            if (language) {
+                                                codeElement.className = `language-${language}`;
+                                            }
+                                            codeElement.textContent = code;
+                                            preElement.appendChild(codeElement);
+                                            contentDiv.appendChild(preElement);
+                                            
+                                            // 如果代码块已完成（以```结尾），应用高亮
+                                            if (part.endsWith('```') && window.hljs) {
+                                                window.hljs.highlightElement(codeElement);
+                                            }
+                                        }
+                                    } else if (part.trim()) {
+                                        const textDiv = document.createElement('div');
+                                        textDiv.textContent = part;
+                                        contentDiv.appendChild(textDiv);
+                                    }
+                                });
+                            } else {
+                                // 普通文本消息
+                                contentDiv.textContent = fullContent;
+                            }
+                            
                             // 滚动到底部
                             contentDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
                         }
@@ -1369,7 +1406,7 @@ async function regenerateResponse(messageDiv) {
             i > 0 && currentChat.messages[i-1].role === 'user') {
             dataMessageIndex++;
             if (dataMessageIndex === Math.floor(messageIndex / 2)) { // 因为UI中每对消息占两个位置
-                // 移除这条消息及其后的所有消息
+                // 移除这条消息及���后的所有消息
                 currentChat.messages = currentChat.messages.slice(0, i);
                 break;
             }
