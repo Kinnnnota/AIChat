@@ -75,80 +75,89 @@ function isAuthenticated() {
 
 // 显示登录/注册表单
 function showAuthForm() {
-    const chatContainer = document.getElementById('chatContainer');
-    // 添加样式到 body 和 html 以防止滚动
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-    
-    chatContainer.innerHTML = `
-        <div class="auth-container">
-            <div class="auth-box">
-                <h2 class="auth-title">欢迎使用AI聊天助手</h2>
-                <p class="auth-subtitle">请登录或注册以开始使用</p>
-                
-                <div class="auth-tabs">
-                    <button class="auth-tab active" data-form="login" onclick="switchAuthTab(this, 'login')">
-                        <i class="fas fa-sign-in-alt"></i>
-                        登录账号
-                    </button>
-                    <button class="auth-tab" data-form="register" onclick="switchAuthTab(this, 'register')">
-                        <i class="fas fa-user-plus"></i>
-                        注册新账号
-                    </button>
-                </div>
+    // 隐藏主界面元素
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+    if (sidebar) sidebar.style.display = 'none';
+    if (mainContent) mainContent.style.display = 'none';
 
-                <div id="loginForm" class="auth-panel active">
-                    <div class="form-group">
-                        <label>用户名</label>
-                        <input type="text" id="loginUsername" placeholder="请输入用户名" />
-                    </div>
-                    <div class="form-group">
-                        <label>密码</label>
-                        <input type="password" id="loginPassword" placeholder="请输入密码" />
-                    </div>
-                    <button class="auth-button" onclick="login()">
-                        <i class="fas fa-sign-in-alt"></i>
-                        登录
-                    </button>
-                    <p class="form-tip">还没有账号？ <a href="#" onclick="switchAuthTab(document.querySelector('[data-form=register]'), 'register'); return false;">立即注册</a></p>
-                </div>
+    // 创建认证容器
+    const authContainer = document.createElement('div');
+    authContainer.className = 'auth-container';
+    document.body.appendChild(authContainer);
 
-                <div id="registerForm" class="auth-panel">
-                    <div class="form-group">
-                        <label>用户名</label>
-                        <input type="text" id="registerUsername" placeholder="请设置用户名" />
-                    </div>
-                    <div class="form-group">
-                        <label>密码</label>
-                        <input type="password" id="registerPassword" placeholder="请设置密码" oninput="validatePassword()" />
-                        <small class="password-hint">密码长度至少为8位</small>
-                    </div>
-                    <div class="form-group">
-                        <label>确认密码</label>
-                        <input type="password" id="registerPasswordConfirm" placeholder="请再次输入密码" oninput="validatePassword()" />
-                        <small class="password-match-hint"></small>
-                    </div>
-                    <button class="auth-button" id="registerButton" onclick="register()" disabled>
-                        <i class="fas fa-user-plus"></i>
-                        注册
-                    </button>
-                    <p class="form-tip">已有账号？ <a href="#" onclick="switchAuthTab(document.querySelector('[data-form=login]'), 'login'); return false;">立即登录</a></p>
+    authContainer.innerHTML = `
+        <div class="auth-box">
+            <h2 class="auth-title">欢迎使用AI聊天助手</h2>
+            <p class="auth-subtitle">请登录或注册以开始使用</p>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-form="login" onclick="switchAuthTab(this, 'login')">
+                    <i class="fas fa-sign-in-alt"></i>
+                    登录账号
+                </button>
+                <button class="auth-tab" data-form="register" onclick="switchAuthTab(this, 'register')">
+                    <i class="fas fa-user-plus"></i>
+                    注册新账号
+                </button>
+            </div>
+
+            <div id="loginForm" class="auth-panel active">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="loginUsername" placeholder="请输入用户名" />
                 </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="loginPassword" placeholder="请输入密码" />
+                </div>
+                <button class="auth-button" onclick="login()">
+                    <i class="fas fa-sign-in-alt"></i>
+                    登录
+                </button>
+                <p class="form-tip">还没有账号？ <a href="#" onclick="switchAuthTab(document.querySelector('[data-form=register]'), 'register'); return false;">立即注册</a></p>
+            </div>
+
+            <div id="registerForm" class="auth-panel">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="registerUsername" placeholder="请设置用户名" />
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="registerPassword" placeholder="请设置密码" oninput="validatePassword()" />
+                    <small class="password-hint">密码长度至少为8位</small>
+                </div>
+                <div class="form-group">
+                    <label>确认密码</label>
+                    <input type="password" id="registerPasswordConfirm" placeholder="请再次输入密码" oninput="validatePassword()" />
+                    <small class="password-match-hint"></small>
+                </div>
+                <button class="auth-button" id="registerButton" onclick="register()" disabled>
+                    <i class="fas fa-user-plus"></i>
+                    注册
+                </button>
+                <p class="form-tip">已有账号？ <a href="#" onclick="switchAuthTab(document.querySelector('[data-form=login]'), 'login'); return false;">立即登录</a></p>
             </div>
         </div>
     `;
 
-    // 添加 Font Awesome 图标
-    if (!document.querySelector('link[href*="font-awesome"]')) {
-        const fontAwesome = document.createElement('link');
-        fontAwesome.rel = 'stylesheet';
-        fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
-        document.head.appendChild(fontAwesome);
-    }
-
-    // 添加样式
+    // 添加新的样式
     const style = document.createElement('style');
     style.textContent = `
+        .auth-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
         html, body {
             margin: 0;
             padding: 0;
@@ -159,16 +168,6 @@ function showAuthForm() {
             height: 100vh;
             margin: 0;
             padding: 0;
-        }
-
-        .auth-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            background: #f5f5f5;
-            padding: 20px;
-            box-sizing: border-box;
         }
 
         .auth-box {
@@ -545,16 +544,18 @@ async function init() {
         currentChatId = null;
         currentModel = '';
         
-        // 重置 body 和 html 的样式
-        document.body.style.overflow = '';
-        document.documentElement.style.overflow = '';
-        
         // 显示登录表单
         showAuthForm();
         return;
     }
 
     try {
+        // 显示主界面元素
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+        if (sidebar) sidebar.style.display = 'flex';
+        if (mainContent) mainContent.style.display = 'flex';
+        
         // 加载其他必要的数据
         await loadModels();
         await loadChatGroups();
@@ -579,10 +580,17 @@ async function handleLoginSuccess(token) {
     authToken = token;
     localStorage.setItem('authToken', token);
     
-    // 清理现有数据
-    chatGroups = [];
-    currentChatId = null;
-    currentModel = '';
+    // 移除认证容器
+    const authContainer = document.querySelector('.auth-container');
+    if (authContainer) {
+        authContainer.remove();
+    }
+    
+    // 显示主界面元素
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+    if (sidebar) sidebar.style.display = 'flex';
+    if (mainContent) mainContent.style.display = 'flex';
     
     // 重新初始化页面
     await init();
