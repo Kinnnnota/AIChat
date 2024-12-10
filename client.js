@@ -11,6 +11,13 @@ let config = null;
 // 认证令牌
 let authToken = localStorage.getItem('authToken');
 
+// 在文件开头添加 marked 库的引用
+if (!document.querySelector('script[src*="marked"]')) {
+    const markedScript = document.createElement('script');
+    markedScript.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+    document.head.appendChild(markedScript);
+}
+
 // 加载配置文件
 async function loadConfig() {
     try {
@@ -1300,37 +1307,44 @@ async function handleStreamResponse(response, contentDiv) {
                             // 清空现有内容
                             contentDiv.innerHTML = '';
                             
-                            // 检测和处理代码块
-                            if (fullContent.includes('```')) {
-                                const parts = fullContent.split(/(```[a-z]*\n[\s\S]*?(?:```|$))/g);
-                                parts.forEach(part => {
-                                    if (part.startsWith('```')) {
-                                        // 尝试匹配完整或未完成的代码块
-                                        const match = part.match(/```([a-z]*)\n([\s\S]*?)(?:```|$)/);
-                                        if (match) {
-                                            const [, language, code] = match;
-                                            const preElement = document.createElement('pre');
-                                            const codeElement = document.createElement('code');
-                                            if (language) {
-                                                codeElement.className = `language-${language}`;
+                            // 使用 marked 处理 Markdown
+                            if (window.marked) {
+                                // 保持代码块的特殊处理
+                                if (fullContent.includes('```')) {
+                                    const parts = fullContent.split(/(```[a-z]*\n[\s\S]*?(?:```|$))/g);
+                                    parts.forEach(part => {
+                                        if (part.startsWith('```')) {
+                                            // 处理代码块的逻辑保持不变
+                                            const match = part.match(/```([a-z]*)\n([\s\S]*?)(?:```|$)/);
+                                            if (match) {
+                                                const [, language, code] = match;
+                                                const preElement = document.createElement('pre');
+                                                const codeElement = document.createElement('code');
+                                                if (language) {
+                                                    codeElement.className = `language-${language}`;
+                                                }
+                                                codeElement.textContent = code;
+                                                preElement.appendChild(codeElement);
+                                                contentDiv.appendChild(preElement);
+                                                
+                                                if (part.endsWith('```') && window.hljs) {
+                                                    window.hljs.highlightElement(codeElement);
+                                                }
                                             }
-                                            codeElement.textContent = code;
-                                            preElement.appendChild(codeElement);
-                                            contentDiv.appendChild(preElement);
-                                            
-                                            // 如果代码块已完成（以```结尾），应用高亮
-                                            if (part.endsWith('```') && window.hljs) {
-                                                window.hljs.highlightElement(codeElement);
-                                            }
+                                        } else if (part.trim()) {
+                                            // 使用 marked 处理非代码块部分
+                                            const parsedHtml = marked.parse(part);
+                                            const tempDiv = document.createElement('div');
+                                            tempDiv.innerHTML = parsedHtml;
+                                            contentDiv.appendChild(tempDiv);
                                         }
-                                    } else if (part.trim()) {
-                                        const textDiv = document.createElement('div');
-                                        textDiv.textContent = part;
-                                        contentDiv.appendChild(textDiv);
-                                    }
-                                });
+                                    });
+                                } else {
+                                    // 如果没有代码块，直接用 marked 处理全部内容
+                                    contentDiv.innerHTML = marked.parse(fullContent);
+                                }
                             } else {
-                                // 普通文本消息
+                                // 如果 marked 还没加载完，使用简单的文本显示
                                 contentDiv.textContent = fullContent;
                             }
                             
@@ -1405,8 +1419,8 @@ async function regenerateResponse(messageDiv) {
         if (currentChat.messages[i].role === 'assistant' && 
             i > 0 && currentChat.messages[i-1].role === 'user') {
             dataMessageIndex++;
-            if (dataMessageIndex === Math.floor(messageIndex / 2)) { // 因为UI中每对消息占两个位置
-                // 移除这条消息及���后的所有消息
+            if (dataMessageIndex === Math.floor(messageIndex / 2)) { // 因为UI中每对消息占2个位置
+                // 移除这条消息及后的所有消息
                 currentChat.messages = currentChat.messages.slice(0, i);
                 break;
             }
@@ -1549,6 +1563,64 @@ function showToast(message, type = 'warning') {
         toast.remove();
     }, 3000);
 }
+
+// 添加 Markdown 样式
+const markdownStyle = document.createElement('style');
+markdownStyle.textContent = `
+    .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+        margin-top: 16px;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+    
+    .content h1 { font-size: 2em; }
+    .content h2 { font-size: 1.5em; }
+    .content h3 { font-size: 1.17em; }
+    
+    .content ul, .content ol {
+        padding-left: 20px;
+        margin: 8px 0;
+    }
+    
+    .content li {
+        margin: 4px 0;
+    }
+    
+    .content p {
+        margin: 8px 0;
+        line-height: 1.5;
+    }
+    
+    .content blockquote {
+        border-left: 4px solid #ddd;
+        margin: 8px 0;
+        padding-left: 16px;
+        color: #666;
+    }
+    
+    .content hr {
+        border: none;
+        border-top: 1px solid #ddd;
+        margin: 16px 0;
+    }
+    
+    .content table {
+        border-collapse: collapse;
+        margin: 8px 0;
+        width: 100%;
+    }
+    
+    .content th, .content td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    
+    .content th {
+        background-color: #f5f5f5;
+    }
+`;
+document.head.appendChild(markdownStyle);
 
 // 初始化页面
 init();
