@@ -962,7 +962,43 @@ function displayChatMessages(chat) {
         chat.messages.forEach(msg => {
             // 如果是用户消息，需要提取原始内容
             const content = msg.role === 'user' ? extractOriginalMessage(msg.content) : msg.content;
-            addMessageToChat(msg.role, content, false);
+            const contentDiv = addMessageToChat(msg.role, '', false);
+            
+            // 使用与流式响应相同的渲染逻辑
+            if (window.marked) {
+                if (content.includes('```')) {
+                    const parts = content.split(/(```[a-z]*\n[\s\S]*?(?:```|$))/g);
+                    parts.forEach(part => {
+                        if (part.startsWith('```')) {
+                            const match = part.match(/```([a-z]*)\n([\s\S]*?)(?:```|$)/);
+                            if (match) {
+                                const [, language, code] = match;
+                                const preElement = document.createElement('pre');
+                                const codeElement = document.createElement('code');
+                                if (language) {
+                                    codeElement.className = `language-${language}`;
+                                }
+                                codeElement.textContent = code.trim();
+                                preElement.appendChild(codeElement);
+                                contentDiv.appendChild(preElement);
+                                
+                                if (window.hljs) {
+                                    window.hljs.highlightElement(codeElement);
+                                }
+                            }
+                        } else if (part.trim()) {
+                            const parsedHtml = marked.parse(part);
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = parsedHtml;
+                            contentDiv.appendChild(tempDiv);
+                        }
+                    });
+                } else {
+                    contentDiv.innerHTML = marked.parse(content);
+                }
+            } else {
+                contentDiv.textContent = content;
+            }
         });
     }
 }
