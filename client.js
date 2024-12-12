@@ -925,7 +925,28 @@ function updateChatList() {
     });
 }
 
-// 加载可用模型列表
+// 在 loadModels 函数之前添加这个新函数
+function formatModelName(modelId) {
+    // 移除下划线，将首字母大写
+    let name = modelId
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    
+    // 特殊处理一些常见的模型名称
+    name = name
+        .replace(/Gpt/g, 'GPT')
+        .replace(/Claude/g, 'Claude')
+        .replace(/Llama/g, 'LLaMA')
+        .replace(/Qwen/g, 'Qwen');
+    
+    // 保持版本号的格式
+    name = name.replace(/(\d+) (\d+)/g, '$1.$2');
+    
+    return name;
+}
+
+// 修改 loadModels 函数中创建选项的部分
 async function loadModels() {
     try {
         const response = await fetch('http://13.208.112.75:8080/v1/models');
@@ -941,7 +962,8 @@ async function loadModels() {
         data.data.forEach(model => {
             const option = document.createElement('option');
             option.value = model.id;
-            option.textContent = model.name;
+            // 使用格式化函数处理显示名称
+            option.textContent = formatModelName(model.name);
             modelSelect.appendChild(option);
         });
 
