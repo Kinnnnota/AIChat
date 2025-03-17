@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Interface</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧聊天记录 -->
+        <div class="sidebar">
+            <div class="chat-history">
+                <h2>聊天记录</h2>
+                <div class="history-list" id="historyList">
+                    <!-- 聊天记录将在这里动态添加 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 主聊天区域 -->
+        <div class="main-content">
+            <!-- 模型选择器 -->
+            <div class="model-selector">
+                <select id="modelSelect">
+                    <option value="">加载中...</option>
+                </select>
+            </div>
+
+            <!-- 聊天消息区域 -->
+            <div class="chat-container" id="chatContainer">
+                <!-- 消息将在这里动态添加 -->
+            </div>
+
+            <!-- 输入区域 -->
+            <div class="input-container">
+                <textarea id="messageInput" placeholder="输入消息..." rows="3"></textarea>
+                <div class="button-group">
+                    <button id="stopButton" class="stop-button" style="display: none;">停止生成</button>
+                    <button id="sendButton">发送</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="client.js"></script>
+</body>
+</html> 
